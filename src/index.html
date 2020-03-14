@@ -65,10 +65,6 @@
 			}
 		}
 
-		const store = Redux.createStore(Redux.combineReducers({todos, 
-			goals, loading
-		}), Redux.applyMiddleware(ReduxThunk.default, checker))
-
 		function goals(state = [], action){
 			switch(action.type){
 				case ADD_GOAL:
@@ -168,11 +164,11 @@
   	   	  	}
 		}
 
-		function handleAddTodo (todo, cb) {
+		function handleAddTodo (name, cb) {
 			return (dispatch) => {
-				return API.saveTodo(this.input.value)
+				return API.saveTodo(name)
 			      		.then((todo) => {
-				      		dispatch(addGoalAction(todo))
+				      		dispatch(addTodoAction(todo))
 				      		cb()
 			  	  		}).catch( () => {
 			  	  			alert ('There was an error. Try again.')
@@ -193,9 +189,9 @@
 		}
 
 
-		function handleAddGoal(goal, cb) {
+		function handleAddGoal(name, cb) {
 			return (dispatch) => {
-				return API.saveGoal(this.input.value)
+				return API.saveGoal(name)
 			      		.then((goal) => {
 				      		dispatch(addGoalAction(goal))
 				      		cb()
@@ -205,13 +201,14 @@
 			}
 		}
 
-		const thunk = (store) => (next) => (action) => {
-			if (typeof action == 'function'){
-				return action(store.dispatch)
-			}
 
-			return next(action)
-		} 
+
+
+
+		const store = Redux.createStore(Redux.combineReducers({todos, 
+			goals, loading,
+		}), Redux.applyMiddleware(ReduxThunk.default, checker))
+
 
 	</script>
 
@@ -221,7 +218,8 @@
     function List (props) {
       return (
         <ul>
-        	{props.items.map( (item) => (<li key={item.id}>
+        	{props.items.map( (item) => (
+        		<li key={item.id}>
         		<span 
         			onClick={() => props.toggle && props.toggle(item.id)}
         			style={{textDecoration: item.complete ? 'line-through':'none'}}>
@@ -310,7 +308,6 @@
  			const {store} = this.props
  			store.dispatch(handleInitialData())
  			store.subscribe(() => this.forceUpdate())
-
  		}
 
       render() {
